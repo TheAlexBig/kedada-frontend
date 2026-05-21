@@ -1,0 +1,217 @@
+import { ArrowLeft, CalendarDays, ExternalLink, Share2, Tag } from 'lucide-react';
+import { Link, useParams } from 'react-router-dom';
+
+import { getApiErrorMessage } from '../api/client';
+import { ButtonLink } from '../components/ui/Button';
+import { ErrorState, LoadingState } from '../components/ui/Status';
+import { useEventDetail } from '../hooks/useEventDetail';
+import { formatCurrency, formatDate, formatDateRange } from '../utils/format';
+
+export function EventDetailPage() {
+  const { id } = useParams();
+  const detail = useEventDetail(id);
+
+  if (detail.isLoading) {
+    return (
+      <section className="mx-auto max-w-4xl px-4 py-10 sm:px-6 lg:px-8">
+        <LoadingState label="Cargando detalle del evento..." />
+      </section>
+    );
+  }
+
+  if (detail.isError) {
+    return (
+      <section className="mx-auto max-w-4xl px-4 py-10 sm:px-6 lg:px-8">
+        <ErrorState message={getApiErrorMessage(detail.error)} />
+      </section>
+    );
+  }
+
+  if (!detail.data) {
+    return null;
+  }
+
+  const { event, metrics } = detail.data;
+  const schedules = event.schedules ?? [];
+
+  return (
+    <article>
+      <div className="bg-white">
+        <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
+          <Link
+            to="/eventos"
+            className="inline-flex items-center gap-2 text-sm font-semibold text-stone-600 hover:text-rose-700"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Volver a eventos
+          </Link>
+
+          <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_320px]">
+            <div>
+              <div className="flex flex-wrap gap-2">
+                {event.category?.name && (
+                  <span className="inline-flex items-center gap-1 rounded-md bg-teal-50 px-3 py-1 text-sm font-semibold text-teal-800">
+                    <Tag className="h-4 w-4" />
+                    {event.category.name}
+                  </span>
+                )}
+                {event.priority && (
+                  <span className="rounded-md bg-rose-50 px-3 py-1 text-sm font-semibold text-rose-700">
+                    Prioridad {event.priority}
+                  </span>
+                )}
+              </div>
+
+              <h1 className="mt-5 text-4xl font-black leading-tight text-stone-950 sm:text-5xl">
+                {event.title}
+              </h1>
+              <p className="mt-5 whitespace-pre-line text-lg leading-8 text-stone-700">
+                {event.description || 'Sin descripcion disponible.'}
+              </p>
+            </div>
+
+            <aside className="h-fit rounded-lg border border-stone-200 bg-stone-50 p-5">
+              <dl className="space-y-4 text-sm">
+                <div>
+                  <dt className="font-semibold text-stone-500">Precio</dt>
+                  <dd className="mt-1 text-lg font-black text-stone-950">
+                    {formatCurrency(event.price)}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="font-semibold text-stone-500">Fecha</dt>
+                  <dd className="mt-1 text-stone-900">
+                    {schedules[0]
+                      ? formatDateRange(schedules[0].startDate, schedules[0].endDate)
+                      : 'Fecha no publicada'}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="font-semibold text-stone-500">Publicado</dt>
+                  <dd className="mt-1 text-stone-900">{formatDate(event.createdAt)}</dd>
+                </div>
+                <div>
+                  <dt className="font-semibold text-stone-500">Actualizado</dt>
+                  <dd className="mt-1 text-stone-900">{formatDate(event.updatedAt)}</dd>
+                </div>
+                {metrics && (
+                  <div>
+                    <dt className="font-semibold text-stone-500">Interaccion</dt>
+                    <dd className="mt-1 text-stone-900">
+                      {metrics.views} vistas · {metrics.shares} compartidos
+                    </dd>
+                  </div>
+                )}
+              </dl>
+
+              <div className="mt-6 grid gap-3">
+                {event.siteUrl?.url && (
+                  <a
+                    href={event.siteUrl.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex h-11 items-center justify-center gap-2 rounded-md bg-rose-600 px-4 text-sm font-semibold text-white transition hover:bg-rose-700"
+                  >
+                    Sitio oficial
+                    <ExternalLink className="h-4 w-4" />
+                  </a>
+                )}
+                {event.referenceUrl?.url && (
+                  <a
+                    href={event.referenceUrl.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex h-11 items-center justify-center gap-2 rounded-md border border-stone-300 bg-white px-4 text-sm font-semibold text-stone-900 transition hover:border-rose-300 hover:text-rose-700"
+                  >
+                    Referencia
+                    <ExternalLink className="h-4 w-4" />
+                  </a>
+                )}
+                {!event.siteUrl?.url && !event.referenceUrl?.url && (
+                  <p className="rounded-md bg-white p-3 text-sm text-stone-600">
+                    Este evento aun no tiene enlaces externos publicados.
+                  </p>
+                )}
+              </div>
+            </aside>
+          </div>
+        </div>
+      </div>
+
+      <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8">
+        <div className="overflow-hidden rounded-lg border border-stone-200 bg-white">
+          <div className="aspect-[16/7] bg-gradient-to-br from-rose-100 via-amber-100 to-teal-100">
+            {event.thumbnail ? (
+              <div className="flex h-full items-center justify-center p-6 text-center font-medium text-stone-700">
+                Thumbnail registrado con UUID {event.thumbnail}
+              </div>
+            ) : (
+              <div className="flex h-full items-center justify-center text-xl font-black text-stone-700">
+                Kedada
+              </div>
+            )}
+          </div>
+        </div>
+
+        <section className="mt-8 rounded-lg border border-stone-200 bg-white p-5">
+          <div className="flex items-center gap-2">
+            <CalendarDays className="h-5 w-5 text-rose-600" />
+            <h2 className="text-xl font-black text-stone-950">Fechas</h2>
+          </div>
+
+          {schedules.length > 0 ? (
+            <ol className="mt-4 divide-y divide-stone-200">
+              {schedules.map((schedule) => (
+                <li key={schedule.id} className="py-4 first:pt-0 last:pb-0">
+                  <p className="font-semibold text-stone-950">
+                    {formatDateRange(schedule.startDate, schedule.endDate)}
+                  </p>
+                  <p className="mt-1 text-sm text-stone-500">
+                    {schedule.endDate ? 'Inicio y finalizacion' : 'Fecha de inicio'}
+                  </p>
+                </li>
+              ))}
+            </ol>
+          ) : (
+            <p className="mt-4 rounded-md bg-stone-50 p-4 text-sm text-stone-600">
+              Este evento aun no tiene fechas publicadas.
+            </p>
+          )}
+        </section>
+
+        <div className="mt-8 rounded-lg border border-stone-200 bg-white p-5">
+          <h2 className="text-xl font-black text-stone-950">Metadatos</h2>
+          <dl className="mt-4 grid gap-4 text-sm sm:grid-cols-2">
+            <div>
+              <dt className="font-semibold text-stone-500">ID del evento</dt>
+              <dd className="mt-1 break-all text-stone-900">{event.id}</dd>
+            </div>
+            <div>
+              <dt className="font-semibold text-stone-500">ID de categoria</dt>
+              <dd className="mt-1 break-all text-stone-900">{event.categoryId}</dd>
+            </div>
+            {event.siteUrlId && (
+              <div>
+                <dt className="font-semibold text-stone-500">ID de sitio oficial</dt>
+                <dd className="mt-1 break-all text-stone-900">{event.siteUrlId}</dd>
+              </div>
+            )}
+            {event.referenceUrlId && (
+              <div>
+                <dt className="font-semibold text-stone-500">ID de referencia</dt>
+                <dd className="mt-1 break-all text-stone-900">{event.referenceUrlId}</dd>
+              </div>
+            )}
+          </dl>
+        </div>
+
+        <div className="mt-8">
+          <ButtonLink to="/eventos" variant="secondary">
+            <Share2 className="h-4 w-4" />
+            Seguir explorando
+          </ButtonLink>
+        </div>
+      </div>
+    </article>
+  );
+}
