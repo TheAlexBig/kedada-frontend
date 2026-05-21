@@ -1,21 +1,21 @@
 # Kedada Frontend
 
-Frontend web para descubrir eventos publicados por la API de Kedada.
+Web frontend for discovering events published by the Kedada API.
 
-## Requisitos
+## Requirements
 
-- Node.js 20 o superior.
-- Backend Kedada corriendo en `http://localhost:8080`.
+- Node.js 20 or newer.
+- Kedada backend running at `http://localhost:8080`.
 
-## Configuracion
+## Configuration
 
-Crea un archivo `.env` si necesitas cambiar la URL del backend:
+Create a `.env` file if you need to change the backend URL:
 
 ```bash
 VITE_API_BASE_URL=http://localhost:8080
 ```
 
-## Comandos
+## Commands
 
 ```bash
 npm install
@@ -25,37 +25,39 @@ npm run preview
 npm run lint
 ```
 
-## Rutas
+## Routes
 
-- `/`: inicio con busqueda, eventos destacados y eventos recientes.
-- `/eventos`: listado paginado con busqueda y filtro por categoria.
-- `/eventos/:id`: detalle de evento.
+- `/`: home page with search, featured events, and recent events.
+- `/eventos`: paginated event list with search and category filtering.
+- `/eventos/:id`: event detail page.
 
-## Endpoints usados
+## Used Endpoints
 
 - `GET /api/v1/events`
 - `GET /api/v1/events/{id}`
 - `GET /api/v1/categories`
 - `GET /api/v1/categories/{id}`
 - `GET /api/v1/urls/{id}`
+- `GET /api/v1/schedules`
 - `GET /api/v1/events/{eventId}/metrics/summary`
 
-## Supuestos y gaps de API
+## API Assumptions And Gaps
 
-- `EventResponse` devuelve `categoryId`, `siteUrlId` y `referenceUrlId`, no objetos
-  embebidos. El frontend resuelve esos datos con llamadas separadas y tolera errores
-  en campos opcionales.
-- `thumbnail` es un UUID, pero la API no expone un endpoint de archivos/imagenes. La
-  UI muestra un bloque visual estable y el UUID cuando existe.
-- No se encontro configuracion CORS en el backend. Si el navegador bloquea peticiones
-  desde Vite, el backend debe permitir el origen del frontend, por ejemplo
+- `EventResponse` returns `categoryId`, `siteUrlId`, and `referenceUrlId`, not
+  embedded objects. The frontend resolves those values with separate calls and
+  tolerates failures for optional fields.
+- `thumbnail` is a UUID, but the API does not expose a file/image endpoint. The
+  UI shows a stable visual block and the UUID when one exists.
+- No CORS configuration was found in the backend. If the browser blocks requests
+  from Vite, the backend must allow the frontend origin, for example
   `http://localhost:5173`.
-- La API lista horarios globales, pero no expone horarios por evento. Por eso el
-  detalle usa fechas de publicacion/actualizacion y no agenda de horarios.
+- The API lists global schedules, but it does not expose a per-event schedule
+  endpoint. The event detail page reads the global schedule list and filters it
+  by `eventId`.
 
 ## Docker
 
-Construir la imagen:
+Build the image:
 
 ```bash
 docker build \
@@ -63,10 +65,10 @@ docker build \
   -t kedada-frontend:local .
 ```
 
-Correr el contenedor:
+Run the container:
 
 ```bash
 docker run --rm -p 5173:80 kedada-frontend:local
 ```
 
-La app quedara disponible en `http://localhost:5173`.
+The app will be available at `http://localhost:5173`.
