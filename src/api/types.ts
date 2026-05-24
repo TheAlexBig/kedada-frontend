@@ -21,9 +21,7 @@ export interface EventResponse {
   priority: number | null;
   thumbnail: UUID | null;
   price: number | null;
-  siteUrlId: UUID | null;
-  referenceUrlId: UUID | null;
-  categoryId: UUID;
+  categoryIds: UUID[];
   createdAt: string;
   updatedAt: string;
 }
@@ -37,6 +35,7 @@ export interface CategoryResponse {
 
 export interface UrlResponse {
   id: UUID;
+  eventId: UUID | null;
   url: string;
   description: string | null;
   ownerId: UUID | null;
@@ -71,9 +70,8 @@ export interface EventSearchParams {
 }
 
 export interface EnrichedEvent extends EventResponse {
-  category?: CategoryResponse;
-  siteUrl?: UrlResponse;
-  referenceUrl?: UrlResponse;
+  categories?: CategoryResponse[];
+  urls?: UrlResponse[];
   schedules?: ScheduleResponse[];
 }
 

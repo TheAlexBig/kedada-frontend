@@ -45,16 +45,33 @@ export async function getCategory(id: UUID) {
   return response.data;
 }
 
-export async function getUrl(id: UUID) {
-  const response = await apiClient.get<UrlResponse>(`/api/v1/urls/${id}`);
+async function listUrls(eventId: UUID, page = 0, size = 100) {
+  const response = await apiClient.get<PageResponse<UrlResponse>>('/api/v1/urls', {
+    params: { eventId, page, size, sort: 'kind,asc' },
+  });
+
   return response.data;
 }
 
-export async function listSchedules(page = 0, size = 100) {
+export async function listUrlsForEvent(eventId: UUID) {
+  const firstPage = await listUrls(eventId);
+  if (firstPage.last) {
+    return firstPage.content;
+  }
+
+  const remainingPages = await Promise.all(
+    Array.from({ length: firstPage.totalPages - 1 }, (_, index) =>
+      listUrls(eventId, index + 1).then((page) => page.content),
+    ),
+  );
+  return [firstPage.content, ...remainingPages].flat();
+}
+
+export async function listSchedules(eventId: UUID, page = 0, size = 100) {
   const response = await apiClient.get<PageResponse<ScheduleResponse>>(
     '/api/v1/schedules',
     {
-      params: { page, size, sort: 'startDate,asc' },
+      params: { eventId, page, size, sort: 'startDate,asc' },
     },
   );
 
@@ -62,18 +79,17 @@ export async function listSchedules(page = 0, size = 100) {
 }
 
 export async function listSchedulesForEvent(eventId: UUID) {
-  const schedules: ScheduleResponse[] = [];
-  let page = 0;
-  let last = false;
-
-  while (!last) {
-    const response = await listSchedules(page, 100);
-    schedules.push(...response.content.filter((schedule) => schedule.eventId === eventId));
-    last = response.last;
-    page += 1;
+  const firstPage = await listSchedules(eventId, 0, 100);
+  if (firstPage.last) {
+    return firstPage.content;
   }
 
-  return schedules;
+  const remainingPages = await Promise.all(
+    Array.from({ length: firstPage.totalPages - 1 }, (_, index) =>
+      listSchedules(eventId, index + 1, 100).then((page) => page.content),
+    ),
+  );
+  return [firstPage.content, ...remainingPages].flat();
 }
 
 export async function getEventMetricSummary(id: UUID) {

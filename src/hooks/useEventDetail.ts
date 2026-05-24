@@ -4,10 +4,10 @@ import {
   getCategory,
   getEvent,
   getEventMetricSummary,
-  getUrl,
   listSchedulesForEvent,
+  listUrlsForEvent,
 } from '../api/events';
-import type { EnrichedEvent, UUID } from '../api/types';
+import type { CategoryResponse, EnrichedEvent, UUID } from '../api/types';
 
 export function useEventDetail(id: UUID | undefined) {
   return useQuery({
@@ -15,10 +15,9 @@ export function useEventDetail(id: UUID | undefined) {
     enabled: Boolean(id),
     queryFn: async () => {
       const event = await getEvent(id as UUID);
-      const [category, siteUrl, referenceUrl, schedules, metrics] = await Promise.all([
-        getCategory(event.categoryId).catch(() => undefined),
-        event.siteUrlId ? getUrl(event.siteUrlId).catch(() => undefined) : undefined,
-        event.referenceUrlId ? getUrl(event.referenceUrlId).catch(() => undefined) : undefined,
+      const [categories, urls, schedules, metrics] = await Promise.all([
+        Promise.all(event.categoryIds.map((categoryId) => getCategory(categoryId).catch(() => undefined))),
+        listUrlsForEvent(event.id).catch(() => undefined),
         listSchedulesForEvent(event.id).catch(() => undefined),
         getEventMetricSummary(event.id).catch(() => undefined),
       ]);
@@ -26,9 +25,8 @@ export function useEventDetail(id: UUID | undefined) {
       return {
         event: {
           ...event,
-          category,
-          siteUrl,
-          referenceUrl,
+          categories: categories.filter((category): category is CategoryResponse => category !== undefined),
+          urls,
           schedules,
         } satisfies EnrichedEvent,
         metrics,

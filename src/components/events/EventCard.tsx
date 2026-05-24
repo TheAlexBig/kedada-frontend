@@ -5,6 +5,8 @@ import type { EnrichedEvent } from '../../api/types';
 import { formatCurrency, formatDate, truncate } from '../../utils/format';
 
 export function EventCard({ event }: { event: EnrichedEvent }) {
+  const primaryUrl = event.urls?.find((url) => url.kind === 'official') ?? event.urls?.[0];
+
   return (
     <article className="group flex h-full flex-col overflow-hidden rounded-lg border border-stone-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-rose-200 hover:shadow-md">
       <Link to={`/eventos/${event.id}`} className="block">
@@ -23,12 +25,12 @@ export function EventCard({ event }: { event: EnrichedEvent }) {
 
       <div className="flex flex-1 flex-col p-5">
         <div className="mb-3 flex flex-wrap items-center gap-2">
-          {event.category?.name && (
-            <span className="inline-flex items-center gap-1 rounded-md bg-teal-50 px-2.5 py-1 text-xs font-semibold text-teal-800">
+          {event.categories?.map((category) => (
+            <span key={category.id} className="inline-flex items-center gap-1 rounded-md bg-teal-50 px-2.5 py-1 text-xs font-semibold text-teal-800">
               <Tag className="h-3.5 w-3.5" />
-              {event.category.name}
+              {category.name}
             </span>
-          )}
+          ))}
         </div>
 
         <h2 className="line-clamp-2 text-lg font-bold text-stone-950">
@@ -56,14 +58,14 @@ export function EventCard({ event }: { event: EnrichedEvent }) {
             Ver detalle
             <ArrowUpRight className="h-4 w-4" />
           </Link>
-          {event.siteUrl?.url && (
+          {primaryUrl?.url && (
             <a
-              href={event.siteUrl.url}
+              href={primaryUrl.url}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex h-10 items-center justify-center rounded-md border border-stone-300 px-3 text-sm font-semibold text-stone-800 transition hover:border-rose-300 hover:text-rose-700"
             >
-              Sitio oficial
+              {primaryUrl.description || 'Sitio oficial'}
             </a>
           )}
         </div>

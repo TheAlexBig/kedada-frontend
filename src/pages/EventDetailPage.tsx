@@ -33,6 +33,7 @@ export function EventDetailPage() {
 
   const { event, metrics } = detail.data;
   const schedules = event.schedules ?? [];
+  const urls = event.urls ?? [];
 
   return (
     <article>
@@ -49,12 +50,12 @@ export function EventDetailPage() {
           <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_320px]">
             <div>
               <div className="flex flex-wrap gap-2">
-                {event.category?.name && (
-                  <span className="inline-flex items-center gap-1 rounded-md bg-teal-50 px-3 py-1 text-sm font-semibold text-teal-800">
+                {event.categories?.map((category) => (
+                  <span key={category.id} className="inline-flex items-center gap-1 rounded-md bg-teal-50 px-3 py-1 text-sm font-semibold text-teal-800">
                     <Tag className="h-4 w-4" />
-                    {event.category.name}
+                    {category.name}
                   </span>
-                )}
+                ))}
               </div>
 
               <h1 className="mt-5 text-4xl font-black leading-tight text-stone-950 sm:text-5xl">
@@ -100,29 +101,23 @@ export function EventDetailPage() {
               </dl>
 
               <div className="mt-6 grid gap-3">
-                {event.siteUrl?.url && (
+                {urls.map((url, index) => (
                   <a
-                    href={event.siteUrl.url}
+                    key={url.id}
+                    href={url.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex h-11 items-center justify-center gap-2 rounded-md bg-rose-600 px-4 text-sm font-semibold text-white transition hover:bg-rose-700"
+                    className={`inline-flex h-11 items-center justify-center gap-2 rounded-md px-4 text-sm font-semibold transition ${
+                      index === 0
+                        ? 'bg-rose-600 text-white hover:bg-rose-700'
+                        : 'border border-stone-300 bg-white text-stone-900 hover:border-rose-300 hover:text-rose-700'
+                    }`}
                   >
-                    Sitio oficial
+                    {url.description || url.kind || 'Enlace externo'}
                     <ExternalLink className="h-4 w-4" />
                   </a>
-                )}
-                {event.referenceUrl?.url && (
-                  <a
-                    href={event.referenceUrl.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex h-11 items-center justify-center gap-2 rounded-md border border-stone-300 bg-white px-4 text-sm font-semibold text-stone-900 transition hover:border-rose-300 hover:text-rose-700"
-                  >
-                    Referencia
-                    <ExternalLink className="h-4 w-4" />
-                  </a>
-                )}
-                {!event.siteUrl?.url && !event.referenceUrl?.url && (
+                ))}
+                {urls.length === 0 && (
                   <p className="rounded-md bg-white p-3 text-sm text-stone-600">
                     Este evento aun no tiene enlaces externos publicados.
                   </p>
@@ -182,21 +177,13 @@ export function EventDetailPage() {
               <dd className="mt-1 break-all text-stone-900">{event.id}</dd>
             </div>
             <div>
-              <dt className="font-semibold text-stone-500">ID de categoria</dt>
-              <dd className="mt-1 break-all text-stone-900">{event.categoryId}</dd>
+              <dt className="font-semibold text-stone-500">IDs de categorias</dt>
+              <dd className="mt-1 break-all text-stone-900">{event.categoryIds.join(', ')}</dd>
             </div>
-            {event.siteUrlId && (
-              <div>
-                <dt className="font-semibold text-stone-500">ID de sitio oficial</dt>
-                <dd className="mt-1 break-all text-stone-900">{event.siteUrlId}</dd>
-              </div>
-            )}
-            {event.referenceUrlId && (
-              <div>
-                <dt className="font-semibold text-stone-500">ID de referencia</dt>
-                <dd className="mt-1 break-all text-stone-900">{event.referenceUrlId}</dd>
-              </div>
-            )}
+            <div>
+              <dt className="font-semibold text-stone-500">Enlaces publicados</dt>
+              <dd className="mt-1 text-stone-900">{urls.length}</dd>
+            </div>
           </dl>
         </div>
 
