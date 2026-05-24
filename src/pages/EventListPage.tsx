@@ -11,10 +11,12 @@ import { SearchForm } from '../components/events/SearchForm';
 import { Button } from '../components/ui/Button';
 import { EmptyState, ErrorState, LoadingState } from '../components/ui/Status';
 import { useEnrichedEvents } from '../hooks/useEnrichedEvents';
+import { useI18n } from '../i18n/I18nContext';
 
 const pageSize = 9;
 
 export function EventListPage() {
+  const { language, t } = useI18n();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
@@ -63,12 +65,12 @@ export function EventListPage() {
   return (
     <section className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
       <div className="mb-8">
-        <p className="text-sm font-semibold uppercase text-rose-700">Agenda</p>
+        <p className="text-sm font-semibold uppercase text-rose-700">{t('Agenda')}</p>
         <h1 className="mt-2 text-3xl font-black text-stone-950 sm:text-4xl">
-          Eventos en El Salvador
+          {t('Eventos en El Salvador')}
         </h1>
         <p className="mt-3 max-w-2xl text-stone-600">
-          Busca eventos publicados y filtra solo con opciones disponibles en la API.
+          {t('Busca eventos publicados y filtra solo con opciones disponibles en la API.')}
         </p>
       </div>
 
@@ -77,15 +79,15 @@ export function EventListPage() {
           <div className="rounded-lg border border-stone-200 bg-white p-4">
             <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-stone-900">
               <SlidersHorizontal className="h-4 w-4" />
-              Buscar
+              {t('Buscar')}
             </div>
             <SearchForm initialValue={q} onSearch={(value) => setParam('q', value)} />
           </div>
 
           {categories.isLoading ? (
-            <LoadingState label="Cargando categorias..." />
+            <LoadingState label={t('Cargando categorias...')} />
           ) : categories.isError ? (
-            <ErrorState message={getApiErrorMessage(categories.error)} />
+            <ErrorState message={getApiErrorMessage(categories.error, language)} />
           ) : (
             <EventFilters
               categories={categoryData?.content ?? []}
@@ -99,15 +101,15 @@ export function EventListPage() {
           {events.isLoading ? (
             <LoadingState />
           ) : events.isError ? (
-            <ErrorState message={getApiErrorMessage(events.error)} />
+            <ErrorState message={getApiErrorMessage(events.error, language)} />
           ) : !eventData || eventData.content.length === 0 ? (
             <EmptyState />
           ) : (
             <>
               <div className="mb-4 flex items-center justify-between text-sm text-stone-600">
-                <span>{eventData.totalElements} eventos encontrados</span>
+                <span>{t('{count} eventos encontrados', { count: eventData.totalElements })}</span>
                 <span>
-                  Pagina {eventData.number + 1} de {Math.max(eventData.totalPages, 1)}
+                  {t('Pagina {page} de {total}', { page: eventData.number + 1, total: Math.max(eventData.totalPages, 1) })}
                 </span>
               </div>
               <EventGrid events={eventData.content} constrained />
@@ -119,7 +121,7 @@ export function EventListPage() {
                   onClick={() => setPage(Math.max(eventData.number - 1, 0))}
                 >
                   <ChevronLeft className="h-4 w-4" />
-                  Anterior
+                  {t('Anterior')}
                 </Button>
                 <Button
                   type="button"
@@ -127,7 +129,7 @@ export function EventListPage() {
                   disabled={eventData.last}
                   onClick={() => setPage(eventData.number + 1)}
                 >
-                  Siguiente
+                  {t('Siguiente')}
                   <ChevronRight className="h-4 w-4" />
                 </Button>
               </div>

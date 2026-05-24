@@ -3,8 +3,10 @@ import { Link } from 'react-router-dom';
 
 import type { EnrichedEvent } from '../../api/types';
 import { formatCurrency, formatDate, truncate } from '../../utils/format';
+import { useI18n } from '../../i18n/I18nContext';
 
 export function EventCard({ event }: { event: EnrichedEvent }) {
+  const { language, t } = useI18n();
   const primaryUrl = event.urls?.find((url) => url.kind === 'official') ?? event.urls?.[0];
 
   return (
@@ -13,7 +15,7 @@ export function EventCard({ event }: { event: EnrichedEvent }) {
         <div className="aspect-[16/9] bg-gradient-to-br from-rose-100 via-amber-100 to-teal-100">
           {event.thumbnail ? (
             <div className="flex h-full items-center justify-center p-6 text-center text-sm font-medium text-stone-600">
-              Imagen registrada: {event.thumbnail.slice(0, 8)}
+              {t('Imagen registrada: {id}', { id: event.thumbnail.slice(0, 8) })}
             </div>
           ) : (
             <div className="flex h-full items-center justify-center text-sm font-semibold text-stone-600">
@@ -39,15 +41,15 @@ export function EventCard({ event }: { event: EnrichedEvent }) {
           </Link>
         </h2>
         <p className="mt-3 line-clamp-3 text-sm leading-6 text-stone-600">
-          {truncate(event.description)}
+          {truncate(event.description, 150, language)}
         </p>
 
         <div className="mt-5 flex flex-wrap gap-3 text-sm text-stone-700">
           <span className="inline-flex items-center gap-1.5">
             <Calendar className="h-4 w-4 text-stone-400" />
-            Publicado {formatDate(event.createdAt)}
+            {t('Publicado {date}', { date: formatDate(event.createdAt, language) })}
           </span>
-          <span className="font-semibold text-stone-950">{formatCurrency(event.price)}</span>
+          <span className="font-semibold text-stone-950">{formatCurrency(event.price, language)}</span>
         </div>
 
         <div className="mt-5 flex flex-wrap gap-2">
@@ -55,7 +57,7 @@ export function EventCard({ event }: { event: EnrichedEvent }) {
             to={`/eventos/${event.id}`}
             className="inline-flex h-10 items-center justify-center gap-2 rounded-md bg-stone-950 px-3 text-sm font-semibold text-white transition hover:bg-rose-700"
           >
-            Ver detalle
+            {t('Ver detalle')}
             <ArrowUpRight className="h-4 w-4" />
           </Link>
           {primaryUrl?.url && (
@@ -65,7 +67,7 @@ export function EventCard({ event }: { event: EnrichedEvent }) {
               rel="noopener noreferrer"
               className="inline-flex h-10 items-center justify-center rounded-md border border-stone-300 px-3 text-sm font-semibold text-stone-800 transition hover:border-rose-300 hover:text-rose-700"
             >
-              {primaryUrl.description || 'Sitio oficial'}
+              {primaryUrl.description || t('Sitio oficial')}
             </a>
           )}
         </div>

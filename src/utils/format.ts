@@ -1,42 +1,44 @@
-export function formatCurrency(value: number | null | undefined) {
+import type { Language } from '../i18n/I18nContext';
+
+export function formatCurrency(value: number | null | undefined, language: Language = 'es') {
   if (value === null || value === undefined) {
-    return 'Precio no publicado';
+    return language === 'es' ? 'Precio no publicado' : 'Price not published';
   }
 
   if (value === 0) {
-    return 'Gratis';
+    return language === 'es' ? 'Gratis' : 'Free';
   }
 
-  return new Intl.NumberFormat('es-SV', {
+  return new Intl.NumberFormat(language === 'es' ? 'es-SV' : 'en-US', {
     style: 'currency',
     currency: 'USD',
   }).format(value);
 }
 
-export function formatDate(value: string | null | undefined) {
+export function formatDate(value: string | null | undefined, language: Language = 'es') {
   if (!value) {
-    return 'Fecha no disponible';
+    return language === 'es' ? 'Fecha no disponible' : 'Date unavailable';
   }
 
-  return new Intl.DateTimeFormat('es-SV', {
+  return new Intl.DateTimeFormat(language === 'es' ? 'es-SV' : 'en-US', {
     dateStyle: 'medium',
     timeStyle: 'short',
   }).format(new Date(value));
 }
 
-export function formatDateRange(startDate: string, endDate: string | null | undefined) {
-  const start = formatDate(startDate);
+export function formatDateRange(startDate: string, endDate: string | null | undefined, language: Language = 'es') {
+  const start = formatDate(startDate, language);
 
   if (!endDate) {
     return start;
   }
 
-  return `${start} - ${formatDate(endDate)}`;
+  return `${start} - ${formatDate(endDate, language)}`;
 }
 
-export function truncate(text: string | null | undefined, maxLength = 150) {
+export function truncate(text: string | null | undefined, maxLength = 150, language: Language = 'es') {
   if (!text) {
-    return 'Sin descripcion disponible.';
+    return language === 'es' ? 'Sin descripcion disponible.' : 'No description available.';
   }
 
   if (text.length <= maxLength) {

@@ -2,13 +2,16 @@ import { CalendarDays, Menu, X } from 'lucide-react';
 import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 
-const navItems = [
-  { to: '/', label: 'Inicio' },
-  { to: '/eventos', label: 'Eventos' },
-];
+import { LanguageSwitcher } from '../../i18n/LanguageSwitcher';
+import { useI18n } from '../../i18n/I18nContext';
 
 export function Header() {
   const [open, setOpen] = useState(false);
+  const { t } = useI18n();
+  const navItems = [
+    { to: '/', label: t('Inicio') },
+    { to: '/eventos', label: t('Eventos') },
+  ];
 
   return (
     <header className="sticky top-0 z-40 border-b border-stone-200 bg-white/90 backdrop-blur">
@@ -38,10 +41,13 @@ export function Header() {
           ))}
         </nav>
 
+        <div className="ml-auto mr-2 md:ml-2 md:mr-0">
+          <LanguageSwitcher />
+        </div>
         <button
           className="grid h-10 w-10 place-items-center rounded-md text-stone-700 hover:bg-stone-100 md:hidden"
           type="button"
-          aria-label={open ? 'Cerrar menu' : 'Abrir menu'}
+          aria-label={open ? t('Cerrar menu') : t('Abrir menu')}
           onClick={() => setOpen((value) => !value)}
         >
           {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}

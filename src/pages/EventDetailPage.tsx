@@ -6,15 +6,17 @@ import { ButtonLink } from '../components/ui/Button';
 import { ErrorState, LoadingState } from '../components/ui/Status';
 import { useEventDetail } from '../hooks/useEventDetail';
 import { formatCurrency, formatDate, formatDateRange } from '../utils/format';
+import { useI18n } from '../i18n/I18nContext';
 
 export function EventDetailPage() {
   const { id } = useParams();
+  const { language, t } = useI18n();
   const detail = useEventDetail(id);
 
   if (detail.isLoading) {
     return (
       <section className="mx-auto max-w-4xl px-4 py-10 sm:px-6 lg:px-8">
-        <LoadingState label="Cargando detalle del evento..." />
+        <LoadingState label={t('Cargando detalle del evento...')} />
       </section>
     );
   }
@@ -22,7 +24,7 @@ export function EventDetailPage() {
   if (detail.isError) {
     return (
       <section className="mx-auto max-w-4xl px-4 py-10 sm:px-6 lg:px-8">
-        <ErrorState message={getApiErrorMessage(detail.error)} />
+        <ErrorState message={getApiErrorMessage(detail.error, language)} />
       </section>
     );
   }
@@ -44,7 +46,7 @@ export function EventDetailPage() {
             className="inline-flex items-center gap-2 text-sm font-semibold text-stone-600 hover:text-rose-700"
           >
             <ArrowLeft className="h-4 w-4" />
-            Volver a eventos
+            {t('Volver a eventos')}
           </Link>
 
           <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_320px]">
@@ -62,39 +64,39 @@ export function EventDetailPage() {
                 {event.title}
               </h1>
               <p className="mt-5 whitespace-pre-line text-lg leading-8 text-stone-700">
-                {event.description || 'Sin descripcion disponible.'}
+                {event.description || t('Sin descripcion disponible.')}
               </p>
             </div>
 
             <aside className="h-fit rounded-lg border border-stone-200 bg-stone-50 p-5">
               <dl className="space-y-4 text-sm">
                 <div>
-                  <dt className="font-semibold text-stone-500">Precio</dt>
+                  <dt className="font-semibold text-stone-500">{t('Precio')}</dt>
                   <dd className="mt-1 text-lg font-black text-stone-950">
-                    {formatCurrency(event.price)}
+                    {formatCurrency(event.price, language)}
                   </dd>
                 </div>
                 <div>
-                  <dt className="font-semibold text-stone-500">Fecha</dt>
+                  <dt className="font-semibold text-stone-500">{t('Fecha')}</dt>
                   <dd className="mt-1 text-stone-900">
                     {schedules[0]
-                      ? formatDateRange(schedules[0].startDate, schedules[0].endDate)
-                      : 'Fecha no publicada'}
+                      ? formatDateRange(schedules[0].startDate, schedules[0].endDate, language)
+                      : t('Fecha no publicada')}
                   </dd>
                 </div>
                 <div>
-                  <dt className="font-semibold text-stone-500">Publicado</dt>
-                  <dd className="mt-1 text-stone-900">{formatDate(event.createdAt)}</dd>
+                  <dt className="font-semibold text-stone-500">{t('Publicado')}</dt>
+                  <dd className="mt-1 text-stone-900">{formatDate(event.createdAt, language)}</dd>
                 </div>
                 <div>
-                  <dt className="font-semibold text-stone-500">Actualizado</dt>
-                  <dd className="mt-1 text-stone-900">{formatDate(event.updatedAt)}</dd>
+                  <dt className="font-semibold text-stone-500">{t('Actualizado')}</dt>
+                  <dd className="mt-1 text-stone-900">{formatDate(event.updatedAt, language)}</dd>
                 </div>
                 {metrics && (
                   <div>
-                    <dt className="font-semibold text-stone-500">Interaccion</dt>
+                    <dt className="font-semibold text-stone-500">{t('Interaccion')}</dt>
                     <dd className="mt-1 text-stone-900">
-                      {metrics.views} vistas · {metrics.shares} compartidos
+                      {t('{views} vistas · {shares} compartidos', { views: metrics.views, shares: metrics.shares })}
                     </dd>
                   </div>
                 )}
@@ -113,13 +115,13 @@ export function EventDetailPage() {
                         : 'border border-stone-300 bg-white text-stone-900 hover:border-rose-300 hover:text-rose-700'
                     }`}
                   >
-                    {url.description || url.kind || 'Enlace externo'}
+                    {url.description || url.kind || t('Enlace externo')}
                     <ExternalLink className="h-4 w-4" />
                   </a>
                 ))}
                 {urls.length === 0 && (
                   <p className="rounded-md bg-white p-3 text-sm text-stone-600">
-                    Este evento aun no tiene enlaces externos publicados.
+                    {t('Este evento aun no tiene enlaces externos publicados.')}
                   </p>
                 )}
               </div>
@@ -133,7 +135,7 @@ export function EventDetailPage() {
           <div className="aspect-[16/7] bg-gradient-to-br from-rose-100 via-amber-100 to-teal-100">
             {event.thumbnail ? (
               <div className="flex h-full items-center justify-center p-6 text-center font-medium text-stone-700">
-                Thumbnail registrado con UUID {event.thumbnail}
+                {t('Thumbnail registrado con UUID {id}', { id: event.thumbnail })}
               </div>
             ) : (
               <div className="flex h-full items-center justify-center text-xl font-black text-stone-700">
@@ -146,7 +148,7 @@ export function EventDetailPage() {
         <section className="mt-8 rounded-lg border border-stone-200 bg-white p-5">
           <div className="flex items-center gap-2">
             <CalendarDays className="h-5 w-5 text-rose-600" />
-            <h2 className="text-xl font-black text-stone-950">Fechas</h2>
+            <h2 className="text-xl font-black text-stone-950">{t('Horarios')}</h2>
           </div>
 
           {schedules.length > 0 ? (
@@ -154,34 +156,34 @@ export function EventDetailPage() {
               {schedules.map((schedule) => (
                 <li key={schedule.id} className="py-4 first:pt-0 last:pb-0">
                   <p className="font-semibold text-stone-950">
-                    {formatDateRange(schedule.startDate, schedule.endDate)}
+                    {formatDateRange(schedule.startDate, schedule.endDate, language)}
                   </p>
                   <p className="mt-1 text-sm text-stone-500">
-                    {schedule.endDate ? 'Inicio y finalizacion' : 'Fecha de inicio'}
+                    {schedule.endDate ? t('Inicio y finalizacion') : t('Fecha de inicio')}
                   </p>
                 </li>
               ))}
             </ol>
           ) : (
             <p className="mt-4 rounded-md bg-stone-50 p-4 text-sm text-stone-600">
-              Este evento aun no tiene fechas publicadas.
+              {t('Este evento aun no tiene horarios publicados.')}
             </p>
           )}
         </section>
 
         <div className="mt-8 rounded-lg border border-stone-200 bg-white p-5">
-          <h2 className="text-xl font-black text-stone-950">Metadatos</h2>
+          <h2 className="text-xl font-black text-stone-950">{t('Metadatos')}</h2>
           <dl className="mt-4 grid gap-4 text-sm sm:grid-cols-2">
             <div>
-              <dt className="font-semibold text-stone-500">ID del evento</dt>
+              <dt className="font-semibold text-stone-500">{t('ID del evento')}</dt>
               <dd className="mt-1 break-all text-stone-900">{event.id}</dd>
             </div>
             <div>
-              <dt className="font-semibold text-stone-500">IDs de categorias</dt>
+              <dt className="font-semibold text-stone-500">{t('IDs de categorias')}</dt>
               <dd className="mt-1 break-all text-stone-900">{event.categoryIds.join(', ')}</dd>
             </div>
             <div>
-              <dt className="font-semibold text-stone-500">Enlaces publicados</dt>
+              <dt className="font-semibold text-stone-500">{t('Enlaces publicados')}</dt>
               <dd className="mt-1 text-stone-900">{urls.length}</dd>
             </div>
           </dl>
@@ -190,7 +192,7 @@ export function EventDetailPage() {
         <div className="mt-8">
           <ButtonLink to="/eventos" variant="secondary">
             <Share2 className="h-4 w-4" />
-            Seguir explorando
+            {t('Seguir explorando')}
           </ButtonLink>
         </div>
       </div>
