@@ -55,11 +55,6 @@ export function EventDetailPage() {
                     {event.category.name}
                   </span>
                 )}
-                {event.priority && (
-                  <span className="rounded-md bg-rose-50 px-3 py-1 text-sm font-semibold text-rose-700">
-                    Prioridad {event.priority}
-                  </span>
-                )}
               </div>
 
               <h1 className="mt-5 text-4xl font-black leading-tight text-stone-950 sm:text-5xl">

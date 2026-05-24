@@ -110,7 +110,7 @@ export function EventListPage() {
                   Pagina {eventData.number + 1} de {Math.max(eventData.totalPages, 1)}
                 </span>
               </div>
-              <EventGrid events={eventData.content} />
+              <EventGrid events={eventData.content} constrained />
               <div className="mt-8 flex items-center justify-center gap-3">
                 <Button
                   type="button"

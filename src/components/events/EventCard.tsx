@@ -29,11 +29,6 @@ export function EventCard({ event }: { event: EnrichedEvent }) {
               {event.category.name}
             </span>
           )}
-          {event.priority && event.priority > 1 && (
-            <span className="rounded-md bg-rose-50 px-2.5 py-1 text-xs font-semibold text-rose-700">
-              Prioridad {event.priority}
-            </span>
-          )}
         </div>
 
         <h2 className="line-clamp-2 text-lg font-bold text-stone-950">

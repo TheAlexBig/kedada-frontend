@@ -78,7 +78,7 @@ export function HomePage() {
       <section className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-sm font-semibold uppercase text-rose-700">Prioridad</p>
+            <p className="text-sm font-semibold uppercase text-rose-700">Recomendados</p>
             <h2 className="mt-1 text-2xl font-black text-stone-950">Eventos destacados</h2>
           </div>
           <ButtonLink to="/eventos?priority=1" variant="secondary">
