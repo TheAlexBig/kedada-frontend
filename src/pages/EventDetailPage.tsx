@@ -1,8 +1,10 @@
+import { useEffect, useState } from 'react';
 import { ArrowLeft, CalendarDays, ExternalLink, Share2, Tag } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
 
 import { getApiErrorMessage } from '../api/client';
-import { ButtonLink } from '../components/ui/Button';
+import { recordEventShare, recordEventView } from '../api/events';
+import { Button, ButtonLink } from '../components/ui/Button';
 import { ErrorState, LoadingState } from '../components/ui/Status';
 import { useEventDetail } from '../hooks/useEventDetail';
 import { formatCurrency, formatDate, formatDateRange } from '../utils/format';
@@ -12,6 +14,40 @@ export function EventDetailPage() {
   const { id } = useParams();
   const { language, t } = useI18n();
   const detail = useEventDetail(id);
+  const { data, refetch } = detail;
+  const [shareMessage, setShareMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!id || !data || wasViewedToday(id)) {
+      return;
+    }
+
+    markViewedToday(id);
+    void recordEventView(id).then(() => refetch()).catch(() => undefined);
+  }, [data, id, refetch]);
+
+  async function handleShare() {
+    if (!id || !detail.data) {
+      return;
+    }
+
+    try {
+      const url = window.location.href;
+      if (navigator.share) {
+        await navigator.share({ title: detail.data.event.title, url });
+      } else {
+        await navigator.clipboard.writeText(url);
+      }
+      await recordEventShare(id);
+      setShareMessage(t('Enlace compartido.'));
+      void detail.refetch();
+    } catch (error) {
+      if (error instanceof DOMException && error.name === 'AbortError') {
+        return;
+      }
+      setShareMessage(t('No se pudo compartir el enlace.'));
+    }
+  }
 
   if (detail.isLoading) {
     return (
@@ -103,6 +139,11 @@ export function EventDetailPage() {
               </dl>
 
               <div className="mt-6 grid gap-3">
+                <Button type="button" variant="secondary" onClick={() => void handleShare()}>
+                  <Share2 className="h-4 w-4" />
+                  {t('Compartir evento')}
+                </Button>
+                {shareMessage && <p className="text-sm text-stone-600">{shareMessage}</p>}
                 {urls.map((url, index) => (
                   <a
                     key={url.id}
@@ -196,4 +237,12 @@ export function EventDetailPage() {
       </div>
     </article>
   );
+}
+
+function wasViewedToday(eventId: string) {
+  return window.localStorage.getItem(`kedada_view_${eventId}`) === new Date().toISOString().slice(0, 10);
+}
+
+function markViewedToday(eventId: string) {
+  window.localStorage.setItem(`kedada_view_${eventId}`, new Date().toISOString().slice(0, 10));
 }

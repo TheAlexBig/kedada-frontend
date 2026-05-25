@@ -104,3 +104,11 @@ export async function getEventMetricSummary(id: UUID) {
   );
   return response.data;
 }
+
+export async function recordEventView(id: UUID) {
+  await apiClient.post(`/api/v1/events/${id}/view`);
+}
+
+export async function recordEventShare(id: UUID) {
+  await apiClient.post(`/api/v1/events/${id}/share`);
+}
