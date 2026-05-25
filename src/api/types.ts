@@ -21,6 +21,7 @@ export interface EventResponse {
   priority: number | null;
   thumbnail: UUID | null;
   price: number | null;
+  visibleOnWebsite: boolean;
   categoryIds: UUID[];
   createdAt: string;
   updatedAt: string;
