@@ -133,10 +133,8 @@ export function EventDetailPage() {
       <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8">
         <div className="overflow-hidden rounded-lg border border-stone-200 bg-white">
           <div className="aspect-[16/7] bg-gradient-to-br from-rose-100 via-amber-100 to-teal-100">
-            {event.thumbnail ? (
-              <div className="flex h-full items-center justify-center p-6 text-center font-medium text-stone-700">
-                {t('Thumbnail registrado con UUID {id}', { id: event.thumbnail })}
-              </div>
+            {event.thumbnailUrl ? (
+              <img className="h-full w-full object-cover" src={event.thumbnailUrl} alt={event.title} />
             ) : (
               <div className="flex h-full items-center justify-center text-xl font-black text-stone-700">
                 Kedada

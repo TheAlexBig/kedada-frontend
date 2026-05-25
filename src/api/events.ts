@@ -4,6 +4,7 @@ import type {
   EventMetricSummaryResponse,
   EventResponse,
   EventSearchParams,
+  MediaAssetResponse,
   PageResponse,
   ScheduleResponse,
   UrlResponse,
@@ -42,6 +43,11 @@ export async function listCategories(page = 0, size = 100) {
 
 export async function getCategory(id: UUID) {
   const response = await apiClient.get<CategoryResponse>(`/api/v1/categories/${id}`);
+  return response.data;
+}
+
+export async function getImage(id: UUID) {
+  const response = await apiClient.get<MediaAssetResponse>(`/api/v1/media/${id}`);
   return response.data;
 }
 

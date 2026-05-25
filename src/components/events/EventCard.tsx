@@ -13,10 +13,8 @@ export function EventCard({ event }: { event: EnrichedEvent }) {
     <article className="group flex h-full flex-col overflow-hidden rounded-lg border border-stone-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-rose-200 hover:shadow-md">
       <Link to={`/eventos/${event.id}`} className="block">
         <div className="aspect-[16/9] bg-gradient-to-br from-rose-100 via-amber-100 to-teal-100">
-          {event.thumbnail ? (
-            <div className="flex h-full items-center justify-center p-6 text-center text-sm font-medium text-stone-600">
-              {t('Imagen registrada: {id}', { id: event.thumbnail.slice(0, 8) })}
-            </div>
+          {event.thumbnailUrl ? (
+            <img className="h-full w-full object-cover" src={event.thumbnailUrl} alt={event.title} />
           ) : (
             <div className="flex h-full items-center justify-center text-sm font-semibold text-stone-600">
               Kedada

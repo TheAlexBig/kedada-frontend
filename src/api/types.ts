@@ -56,6 +56,16 @@ export interface EventMetricSummaryResponse {
   shares: number;
 }
 
+export interface MediaAssetResponse {
+  id: UUID;
+  originalFilename: string;
+  contentType: string;
+  sizeBytes: number;
+  readUrl: string;
+  readUrlExpiresAt: string;
+  createdAt: string;
+}
+
 export interface EventSearchParams {
   q?: string;
   categoryId?: UUID;
@@ -73,6 +83,7 @@ export interface EnrichedEvent extends EventResponse {
   categories?: CategoryResponse[];
   urls?: UrlResponse[];
   schedules?: ScheduleResponse[];
+  thumbnailUrl?: string;
 }
 
 export interface ApiErrorBody {
